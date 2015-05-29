@@ -1,10 +1,21 @@
 #ifndef __siamoz_cnca3_connection
 #define __siamoz_cnca3_connection
 
-#include <string>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <errno.h>
+#include <string.h>
+#include <arpa/inet.h>
 #include <unistd.h>
+#include <iostream>
+#include <string>
+#include "../message/message.h"
 
 using namespace std;
+
+const int buffer_size = 20480;
 
 //TODO: what is connection???
 //constructor? given from (as server)???
@@ -19,6 +30,7 @@ class connection
 {
 	public:
 		connection(void);
+		connection(int fd);
 		connection(int server_port_no, const string &server_ip_address="127.0.0.1");
 		~connection(void);
 
@@ -27,10 +39,16 @@ class connection
 		//blocking method
 		//returns "" on failure
 		//check is_ok_to_communicate before and after using it
-		string send_q_get_a(const string &sending);
+		message send_q_get_a(const message &q);
 
-		//TODO: a func ptr to get response from user of connection.
-		//compelete this after writing main
+		// send a message without expecting the result
+		// e.g: send response of a question
+		void send_message(const message& sending);
+
+		// gets and reads a message.
+		// the return value is return value of read
+		// returns -2 if the connection is not ready
+		int get_message(message& receiving);
 
 		//only for virgin connections
 		//returns 1 on success, 0 on error

@@ -14,10 +14,8 @@
 using namespace std;
 
 int main(int argc, char* argv[]);
-void clear_buff(char *x,size_t s);
 
 const int num_of_connection = 10;
-const int buffer_size = 20480;
 
 #define STDIN (0)
 #define STDOUT (1)
@@ -100,34 +98,12 @@ int main(int argc, char* argv[])
 				}
 				else
 				{
-					int n, m;
-					char buff_read [buffer_size], response_buff[buffer_size];
-					clear_buff(buff_read, buffer_size);
-					clear_buff(response_buff, buffer_size);
-
-					n = read(it_fd, buff_read, buffer_size-1);
-					if(n == 0)
+					int response_result;
+					response_result=shell.handle_message_of_fd(it_fd);
+					if(response_result==0)
 					{
-						close(it_fd);
+						cout<<"client out\n";
 						FD_CLR(it_fd, &read_fdset);
-						cout<<"client out"<<endl;
-					}
-					else if(n < 0)
-					{
-						cout<<"Error reading"<<endl;
-					}
-
-					//after reading successfully
-					else
-					{
-						//after reading client message
-						string client_input = buff_read, server_reply;
-
-						cout<<"new query got.\n";
-						server_reply=shell.get_response_of_gotten_message(client_input, it_fd);
-						int s = write(it_fd, server_reply.c_str(), server_reply.size());
-						if(s < 0)
-							cout<<"send reply error\n";
 					}
 				}
 			}
@@ -137,10 +113,4 @@ int main(int argc, char* argv[])
 
 	close(server_fd);
 	return 0;
-}
-
-void clear_buff(char *x,size_t s)
-{
-	for(int i=0;i<s;i++)
-		x[i] = 0;
 }
