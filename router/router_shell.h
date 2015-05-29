@@ -2,6 +2,7 @@
 #define __siamoz_cnca3_router_shell
 
 #include <string>
+#include <sstream>
 #include "router_kernel.h"
 #include "../connection/connection.h"
 

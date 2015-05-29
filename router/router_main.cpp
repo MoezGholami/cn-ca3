@@ -22,7 +22,7 @@ const int num_of_connection = 10;
 
 int main(int argc, char* argv[])
 {
-	int port_number, server_fd, binding_st, listening_st, ret_val, new_sock_fd, it_fd, status;
+	int port_number, server_fd, binding_st, listening_st, new_sock_fd, it_fd, status;
 	struct sockaddr_in server_addr;
 	struct timeval tv;
 	string stdin_line;

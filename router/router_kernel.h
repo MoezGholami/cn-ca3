@@ -13,6 +13,7 @@ using namespace std;
 const int default_pin_cost	=	1;
 
 typedef string pin;
+const pin null_pin="";
 
 
 class router_kernel
@@ -35,7 +36,7 @@ class router_kernel
 		void update_pin_cost(pin p);	//talk to peer to get the new cost of the pin
 
 		//return 0 if not found
-		pin* pin_ptr_of_fd(int fd);
+		pin pin_ptr_of_fd(int fd);
 		connection* connection_ptr_of_fd(int fd);
 };
 

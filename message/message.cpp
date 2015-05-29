@@ -9,9 +9,9 @@ message message_from_string(string s)
 
 	ss<<s;
 
-	s>>temp;
+	ss>>temp;
 	result.source_ip=temp;
-	s>>temp;
+	ss>>temp;
 	result.destination_ip=temp;
 
 	ss>>d;

@@ -9,7 +9,7 @@ void router_kernel::add_pin(pin p)
 	}
 	pins.push_back(p);
 	pin_local_cost[p]=default_pin_cost;
-	//TODO: what about pin connection???
+	cout<<"in kernel: successfully added pin\n";
 }
 
 void router_kernel::delete_pin(pin p)
@@ -21,7 +21,8 @@ void router_kernel::delete_pin(pin p)
 	}
 	pins.erase(find(pins.begin(), pins.end(), p));
 	pin_local_cost.erase(p);
-	pin_connections.erase(p);//TODO: CAUTION: you should have a proper destructor
+	pin_connections.erase(p);
+	cout<<"in kernel: successfully deleted pin\n";
 }
 
 void router_kernel::change_local_cost(pin p, int new_cost)
@@ -44,6 +45,8 @@ void router_kernel::update_pin_cost(pin p)
 
 int router_kernel::handle_message_of_fd(int fd)
 {
+	//TODO: complete this
+	return 0;
 					 /*
 					int n, m;
 					char buff_read [buffer_size], response_buff[buffer_size];
@@ -81,14 +84,14 @@ int router_kernel::handle_message_of_fd(int fd)
 					// */
 }
 
-pin* router_kernel::pin_ptr_of_fd(int fd)
+pin router_kernel::pin_ptr_of_fd(int fd)
 {
 	for(map<pin, vector<connection> >::iterator it=pin_connections.begin();
 			it!=pin_connections.end(); ++it)
 		for(unsigned i=0; i<(it->second).size(); ++i)
 			if((it->second)[i].get_fd()==fd)
-				return &(it->first);
-	return (pin *)0;
+				return it->first;
+	return null_pin;
 }
 
 connection* router_kernel::connection_ptr_of_fd(int fd)

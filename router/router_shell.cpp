@@ -7,9 +7,28 @@ router_shell::router_shell(void)
 
 void router_shell::do_router_shell_command(const string &command)
 {
+	stringstream ss;
+	string parse1, parse2;
+
+	ss<<command;
+	ss>>parse1;
+
+	if(parse1=="Eth")
+	{
+		ss>>parse2;
+		kernel.add_pin((pin)parse2);
+	}
+	else if(parse1=="NoEth")
+	{
+		ss>>parse2;
+		kernel.delete_pin((pin)parse2);
+	}
+	else
+	{
+	}
 }
 
-int get_new_client_like_connection_fd()
+int router_shell::get_new_client_like_connection_fd()
 {
 	int result=new_client_like_connection_fd;
 	new_client_like_connection_fd=virgin_fd;

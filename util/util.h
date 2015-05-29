@@ -21,4 +21,6 @@ bool FileExist(const string &url);
 
 void clear_buff(char *x,size_t s);
 
+bool equal_ignore_case(string a, string b);
+
 #endif
