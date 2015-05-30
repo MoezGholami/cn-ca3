@@ -41,6 +41,8 @@ class router_kernel
 		void send_debug_message(pin p);
 		void inform_running_port(int p);
 
+		void show_tables(void);//TODO: complete
+
 		//only once
 		int get_new_client_like_connection_fd();
 
@@ -48,6 +50,10 @@ class router_kernel
 		vector<pin> pins; //caution: readundent but for easy checking.
 		map<pin, int> pin_local_cost;
 		map<pin, vector<connection*> > pin_connections;
+
+		map<string, connection*> unicast_routing_table;
+		map<string, vector<connnection *> > multicast_routing_table;
+
 		int debug_message_count;
 		int my_running_port;	//used for debugging
 		int new_client_like_connection_fd;
@@ -63,10 +69,17 @@ class router_kernel
 		int handle_new_connection(int new_fd);
 		void handle_closing_connection(connection *con_ptr);
 		void delete_corrupted_connections_of_pin(pin p);
+		void delete_corrupted_connections_of_all_pins(void);
 
 		void handle_message(connection *con_ptr, const message &m);
-		void handle_router_message(connection *con_ptr, const message &m);
+		void handle_router_message(connection *con_ptr, message &m);
 		void handle_router_cost_message(connection *con_ptr, const message &m);
+
+		void update_tables(connection *con_ptr, const message &m);
+
+		void handle_unicast_message(connection *con_ptr,message &m);
+
+		void broadcast(const message &m, connection *exception=0);
 };
 
 #endif

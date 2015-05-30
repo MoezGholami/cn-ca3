@@ -158,6 +158,10 @@ void router_kernel::send_debug_message(pin p)
 	delete_corrupted_connections_of_pin(p);
 }
 
+void router_kernel::show_tables(void)
+{
+}
+
 void router_kernel::inform_running_port(int p)
 {
 	my_running_port=p;
@@ -217,14 +221,17 @@ int router_kernel::handle_new_connection(int new_fd)
 			delete con_ptr;
 			return 0;
 		}
-		con_ptr->send_message(null_message);
 		pin_connections[p].push_back(con_ptr);
 		cout<<"successfully got a new connection from router (answer)\n";
 		return 1;
 	}
+	else if(receiving.type==my_ip_intro_type)
+	{
+		update_tables(con_ptr, m);
+		pin_connections[base_pin].push_back(con_ptr);
+	}
 	else
 	{
-		//TODO: handle incommin connection from other types
 	}
 	return 1;
 }
@@ -232,6 +239,10 @@ int router_kernel::handle_new_connection(int new_fd)
 void router_kernel::handle_closing_connection(connection *con_ptr)
 {
 	pin parent;
+	map<string, connection *>::iterator it1;
+	map<string, vector<connection *> >::iterator it2;
+	unsigned it3;
+	int deleting_idx=-1;
 
 	parent=pin_of_connection_ptr(con_ptr);
 
@@ -241,6 +252,19 @@ void router_kernel::handle_closing_connection(connection *con_ptr)
 	assert(parent!=null_pin);
 
 	pin_connections[parent].erase(find(pin_connections[parent].begin(), pin_connections[parent].end(), con_ptr));
+
+	for(it1=unicast_routing_table.begin();it1!=unicast_routing_table.end(); ++it1)
+		if(it1->second==con_ptr)
+			break;
+	unicast_routing_table.erase(it1);
+
+	for(it2=multicast_routing_table.begin(); it2!=multicast_routing_table.end() && deleting_idx==-1; ++it2)
+		for(it3=0; it3<(it2->second).size() && deleting_idx==-1; ++it3)
+			if((it2->second)[it3]==con_ptr)
+				deleting_idx=(int)it3;
+
+	if(deleting_idx!=-1)
+		(it2->second).erase((it2->second).begin()+deleting_idx);
 
 	delete con_ptr;
 }
@@ -255,7 +279,13 @@ void router_kernel::delete_corrupted_connections_of_pin(pin p)
 		handle_closing_connection(temp[i]);
 }
 
-void router_kernel::handle_message(connection *con_ptr, const message &m)
+void router_kernel::delete_corrupted_connections_of_all_pins(void)
+{
+	for(unsigned i=0; i<pins.size(); ++i)
+		delete_corrupted_connections_of_pin(pins[i]);
+}
+
+void router_kernel::handle_message(connection *con_ptr, message &m)
 {
 	if(m.type==router_interconnection_debug_type)
 	{
@@ -265,6 +295,11 @@ void router_kernel::handle_message(connection *con_ptr, const message &m)
 	{
 		handle_router_message(con_ptr, m);
 		return ;
+	}
+	if(m.type==unicast_message_type)
+	{
+		update_tables(con_ptr, m);
+		handle_unicast_message(con_ptr,m);
 	}
 }
 
@@ -310,4 +345,29 @@ void router_kernel::handle_router_cost_message(connection *con_ptr, const messag
 			cout<<"successsfully changed cost to "<<parse_int<<endl;
 			con_ptr->set_cost(parse_int);
 	}
+}
+
+void router_kernel::update_tables(connection *con_ptr, const message &m)
+{
+	unicast_routing_table[m.source_ip]=con_ptr;
+}
+
+void router_kernel::handle_unicast_message(connection *con_ptr,message &m)
+{
+	if(--m.ttl==0)
+		return ;
+	if(unicast_routing_table.find(m.destination_ip)!=unicast_routing_table.end())
+		unicast_routing_table[m.destination_ip]->send_message(m);
+	else
+		broadcast(m, con_ptr);
+}
+
+void router_kernel::broadcast(const message &m, connection *exception)
+{
+	for(map<pin, vector<connection *> >::iterator it=pin_connections.begin();
+			it!=pin_connections.end(); ++it)
+		for(unsigned i=0; i<(it->second).size(); ++i)
+			if(((it->second)[i])!=exception)
+				((it->second)[i])->send_message(m);
+	delete_corrupted_connections_of_all_pins();
 }

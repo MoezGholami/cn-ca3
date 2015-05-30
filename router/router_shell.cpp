@@ -43,6 +43,10 @@ void router_shell::do_router_shell_command(const string &command)
 		ss>>parse1>>parse_int;
 		kernel.change_local_cost(parse1, parse_int);
 	}
+	else if(parse1=="Show")
+	{
+		kernel.show_tables();
+	}
 	else
 	{
 		cout<<"command not recognized.\n";
