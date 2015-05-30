@@ -357,7 +357,19 @@ void router_kernel::handle_unicast_message(connection *con_ptr,message &m)
 	if(--m.ttl==0)
 		return ;
 	if(unicast_routing_table.find(m.destination_ip)!=unicast_routing_table.end())
+	{
+		if(! unicast_routing_table[m.destination_ip]->is_ok_to_communicate())
+		{
+			handle_closing_connection(unicast_routing_table[m.destination_ip]);
+			return ;
+		}
 		unicast_routing_table[m.destination_ip]->send_message(m);
+		if(! unicast_routing_table[m.destination_ip]->is_ok_to_communicate())
+		{
+			handle_closing_connection(unicast_routing_table[m.destination_ip]);
+			return ;
+		}
+	}
 	else
 		broadcast(m, con_ptr);
 }
