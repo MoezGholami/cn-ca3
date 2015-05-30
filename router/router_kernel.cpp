@@ -45,6 +45,19 @@ void router_kernel::delete_pin(pin p)
 	cout<<"in kernel: successfully deleted pin\n";
 }
 
+void router_kernel::disconnect_pin(pin p)
+{
+	if(find(pins.begin(), pins.end(), p)==pins.end())
+	{
+		cout<<"error: no such card found.\n";
+		return ;
+	}
+	for(int i=0; i<(int)pin_connections[p].size(); ++i)
+		delete (pin_connections[p][i]);
+	pin_connections[p].clear();
+	cout<<"successfully disconnected.\n";
+}
+
 void router_kernel::change_local_cost(pin p, int new_cost)
 {
 	if(find(pins.begin(), pins.end(), p)==pins.end())
@@ -53,14 +66,38 @@ void router_kernel::change_local_cost(pin p, int new_cost)
 		return ;
 	}
 	pin_local_cost[p]=new_cost;
-	update_pin_cost(p);	//talk to peer to get the new cost of the pin
+	cout<<"successfully changed cost of pin to: "<<new_cost<<endl;
+	update_pin_cost(p);	//talk to all peers to get the new cost of the pin
 }
 
 void router_kernel::update_pin_cost(pin p)
 {
-	//TODO: complete this
-	//talk to all peers to get the new cost of the pin
-	//need connection of the pin
+	for(unsigned i=0; i<pin_connections[p].size(); ++i)
+		synch_connection_new_local_cost(pin_connections[p][i], pin_local_cost[p]);
+	delete_corrupted_connections_of_pin(p);
+}
+
+void router_kernel::synch_connection_new_local_cost(connection *con_ptr, int cost)
+{
+	stringstream ss;
+	string s;
+	int d;
+
+	message receiving;
+	message sending("0","0",0,router_interconnection_message_type,1,"mylocalcost "+toString(cost));
+
+	receiving=con_ptr->send_q_get_a(sending);
+
+	if(!con_ptr->is_ok_to_communicate())
+	{
+		return ;
+	}
+
+	ss<<receiving.body;
+
+	ss>>s>>d;
+	cout<<"successfully changed cost from "<<con_ptr->get_cost()<<" to "<<d<<endl;
+	con_ptr->set_cost(d);
 }
 
 void router_kernel::connect_to_router(pin mine, pin others, int other_port)
@@ -89,7 +126,7 @@ void router_kernel::connect_to_router(pin mine, pin others, int other_port)
 	}
 
 	pin_connections[mine].push_back(con_ptr);
-	update_pin_cost(mine);//TODO: replace with set connection cost
+	synch_connection_new_local_cost(con_ptr, pin_local_cost[mine]);
 }
 
 int router_kernel::handle_message_of_fd(int fd)
@@ -114,8 +151,6 @@ int router_kernel::handle_message_of_fd(int fd)
 
 void router_kernel::send_debug_message(pin p)
 {
-	vector<connection *> corrupteds;
-
 	message debug_message("0","0",++debug_message_count,router_interconnection_debug_type,1,"some"), response;
 	if(find(pins.begin(), pins.end(), p)==pins.end())
 	{
@@ -128,13 +163,11 @@ void router_kernel::send_debug_message(pin p)
 		if(response==null_message)
 		{
 			cout<<"connection corrupted.\n";
-			corrupteds.push_back(pin_connections[p][i]);
 		}
 		else
 			cout<<response.body<<endl;
 	}
-	for(unsigned i=0; i<corrupteds.size(); ++i)
-		handle_closing_connection(corrupteds[i]);
+	delete_corrupted_connections_of_pin(p);
 }
 
 void router_kernel::inform_running_port(int p)
@@ -214,11 +247,62 @@ void router_kernel::handle_closing_connection(connection *con_ptr)
 	delete con_ptr;
 }
 
-void router_kernel::handle_message(connection *con_ptr, message &m)
+void router_kernel::delete_corrupted_connections_of_pin(pin p)
+{
+	vector<connection *>temp;
+	for(unsigned i=0; i<pin_connections[p].size(); ++i)
+		if(!pin_connections[p][i]->is_ok_to_communicate())
+			temp.push_back(pin_connections[p][i]);
+	for(unsigned i=0; i<temp.size(); ++i)
+		handle_closing_connection(temp[i]);
+}
+
+void router_kernel::handle_message(connection *con_ptr, const message &m)
 {
 	if(m.type==router_interconnection_debug_type)
 	{
 		con_ptr->send_message(message("0","0",m.id,m.type,m.ttl,"i'm on port: "+toString(my_running_port)+
-					"i've got your message with id "+toString(m.id)+"\n"));
+					", i've got your message with id "+toString(m.id)+"\n"));
+		return ;
 	}
+	if(m.type==router_interconnection_message_type)
+	{
+		handle_router_message(con_ptr, m);
+		return ;
+	}
+}
+
+void router_kernel::handle_router_message(connection *con_ptr, const message &m)
+{
+	//int parse_int;
+	string parse;
+	stringstream ss;
+
+	ss<<m.body;
+
+	ss>>parse;
+
+	if(parse=="mylocalcost")
+		handle_router_cost_message(con_ptr, m);
+}
+
+void router_kernel::handle_router_cost_message(connection *con_ptr, const message &m)
+{
+	int parse_int;
+	string parse;
+	stringstream ss;
+
+	ss<<m.body;
+	ss>>parse>>parse_int;
+
+	if(pin_local_cost[pin_of_connection_ptr(con_ptr)]>parse_int)
+		con_ptr->set_cost(pin_local_cost[pin_of_connection_ptr(con_ptr)]);
+	else
+	{
+		cout<<"successsfully changed cost to "<<parse_int<<endl;
+		con_ptr->set_cost(parse_int);
+	}
+
+	con_ptr->send_message(message("0","0",0,router_interconnection_message_type,1,
+				"finalcost "+toString(con_ptr->get_cost())));
 }

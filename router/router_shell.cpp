@@ -32,15 +32,21 @@ void router_shell::do_router_shell_command(const string &command)
 	else if(parse1=="Disconnect")
 	{
 		ss>>parse2;
-		kernel.delete_pin(parse2);
+		kernel.disconnect_pin(parse2);
 	}
 	else if(parse1=="debug")
 	{
 		ss>>parse2;
 		kernel.send_debug_message(parse2);
 	}
+	else if(parse1=="ChangeCost")
+	{
+		ss>>parse1>>parse_int;
+		kernel.change_local_cost(parse1, parse_int);
+	}
 	else
 	{
+		cout<<"command not recognized.\n";
 	}
 	//TODO: complete
 }
