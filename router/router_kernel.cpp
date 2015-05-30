@@ -221,6 +221,7 @@ int router_kernel::handle_new_connection(int new_fd)
 			delete con_ptr;
 			return 0;
 		}
+		con_ptr->send_message(null_message);
 		pin_connections[p].push_back(con_ptr);
 		cout<<"successfully got a new connection from router (answer)\n";
 		return 1;
