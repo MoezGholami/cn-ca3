@@ -227,7 +227,7 @@ int router_kernel::handle_new_connection(int new_fd)
 	}
 	else if(receiving.type==my_ip_intro_type)
 	{
-		update_tables(con_ptr, m);
+		update_tables(con_ptr, receiving);
 		pin_connections[base_pin].push_back(con_ptr);
 	}
 	else

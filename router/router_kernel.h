@@ -52,7 +52,7 @@ class router_kernel
 		map<pin, vector<connection*> > pin_connections;
 
 		map<string, connection*> unicast_routing_table;
-		map<string, vector<connnection *> > multicast_routing_table;
+		map<string, vector<connection *> > multicast_routing_table;
 
 		int debug_message_count;
 		int my_running_port;	//used for debugging
@@ -71,8 +71,8 @@ class router_kernel
 		void delete_corrupted_connections_of_pin(pin p);
 		void delete_corrupted_connections_of_all_pins(void);
 
-		void handle_message(connection *con_ptr, const message &m);
-		void handle_router_message(connection *con_ptr, message &m);
+		void handle_message(connection *con_ptr, message &m);
+		void handle_router_message(connection *con_ptr, const message &m);
 		void handle_router_cost_message(connection *con_ptr, const message &m);
 
 		void update_tables(connection *con_ptr, const message &m);
