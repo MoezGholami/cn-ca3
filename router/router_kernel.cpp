@@ -254,10 +254,11 @@ void router_kernel::handle_closing_connection(connection *con_ptr)
 
 	pin_connections[parent].erase(find(pin_connections[parent].begin(), pin_connections[parent].end(), con_ptr));
 
-	for(it1=unicast_routing_table.begin();it1!=unicast_routing_table.end(); ++it1)
+	for(it1=unicast_routing_table.begin();it1!=unicast_routing_table.end();)
 		if(it1->second==con_ptr)
-			break;
-	unicast_routing_table.erase(it1);
+			unicast_routing_table.erase(it1++);
+		else
+			++it1;
 
 	for(it2=multicast_routing_table.begin(); it2!=multicast_routing_table.end() && deleting_idx==-1; ++it2)
 		for(it3=0; it3<(it2->second).size() && deleting_idx==-1; ++it3)
