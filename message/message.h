@@ -18,7 +18,9 @@ const int router_interconnection_debug_type	=	7;
 const int router_interconnection_message_type 	=	8;
 const int router_dvmrp_prune_type		=	9;
 const int multicast_ip_intro_type		=	10;
-
+const int log_type				=	11;
+const int multicast_message_type		= 	12;
+const int unicast_message_type			=	13;
 
 typedef struct message
 {

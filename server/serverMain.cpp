@@ -1,12 +1,9 @@
+//tartib argoman ha
+//ip server
+//port number
+
 #include "serverCore.h"
 using namespace std;
-
-void clear_buff(char *x,size_t s){
-	for(int i=0;i<s;i++){
-		x[i] = 0;
-	}
-}
-
 
 #define STDIN 0
 #define STDOUT 1

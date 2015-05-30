@@ -20,7 +20,11 @@
 #include <arpa/inet.h>
 #include <map>
 
+#include "../connection/connection.h"
+#include "../message/message.h"
+
 using namespace std;
+
 
 class SIP {
 	public:
@@ -34,8 +38,12 @@ class ServerCoreClerk{
 	public:
 	ServerCoreClerk(int port_num);	
 	int doServerCommand();
+	void doClientCommand(int fd);
 	private:
+	vector<SIP*> sip_vector;
 	int port;
+	connection* cn;
+	int global_mid;
 };
 
 
