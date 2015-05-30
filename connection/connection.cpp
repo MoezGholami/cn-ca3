@@ -55,30 +55,6 @@ void connection::close(void)
 	closed=true;
 }
 
-message connection::send_q_get_a(const message &q)
-{
-	int n;
-	message result;
-
-	if(!is_ok_to_communicate())
-		return null_message;
-
-
-	send_message(q);
-	if(!is_ok_to_communicate())
-		return null_message;
-
-	n=get_message(result);
-
-	if(n==0)
-		cout<<"in send_q_get_a: extranous connection close on fd: "<<connection_fd<<endl;
-
-	if(!is_ok_to_communicate())
-		return null_message;
-
-	return result;
-}
-
 void connection::send_message(const message& sending)
 {
 	int s;

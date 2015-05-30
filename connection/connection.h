@@ -38,11 +38,6 @@ class connection
 
 		void close(void);
 
-		//blocking method
-		//returns "" on failure
-		//check is_ok_to_communicate before and after using it
-		message send_q_get_a(const message &q);
-
 		// send a message without expecting the result
 		// e.g: send response of a question
 		void send_message(const message& sending);

@@ -86,7 +86,7 @@ void router_kernel::synch_connection_new_local_cost(connection *con_ptr, int cos
 	message receiving;
 	message sending("0","0",0,router_interconnection_message_type,1,"mylocalcost "+toString(cost));
 
-	receiving=con_ptr->send_q_get_a(sending);
+	receiving=con_ptr->send_message(sending);
 
 	if(!con_ptr->is_ok_to_communicate())
 	{
@@ -151,7 +151,7 @@ int router_kernel::handle_message_of_fd(int fd)
 
 void router_kernel::send_debug_message(pin p)
 {
-	message debug_message("0","0",++debug_message_count,router_interconnection_debug_type,1,"some"), response;
+	message debug_message("0","0",++debug_message_count,router_interconnection_debug_type,1,"some");
 	if(find(pins.begin(), pins.end(), p)==pins.end())
 	{
 		cout<<"no such pin\n";
@@ -159,13 +159,7 @@ void router_kernel::send_debug_message(pin p)
 	}
 	for(unsigned i=0; i<pin_connections[p].size(); ++i)
 	{
-		response=pin_connections[p][i]->send_q_get_a(debug_message);
-		if(response==null_message)
-		{
-			cout<<"connection corrupted.\n";
-		}
-		else
-			cout<<response.body<<endl;
+		pin_connections[p][i]->send_message(debug_message);
 	}
 	delete_corrupted_connections_of_pin(p);
 }
@@ -261,9 +255,7 @@ void router_kernel::handle_message(connection *con_ptr, const message &m)
 {
 	if(m.type==router_interconnection_debug_type)
 	{
-		con_ptr->send_message(message("0","0",m.id,m.type,m.ttl,"i'm on port: "+toString(my_running_port)+
-					", i've got your message with id "+toString(m.id)+"\n"));
-		return ;
+		cout<<"got a debug message.\n";
 	}
 	if(m.type==router_interconnection_message_type)
 	{
