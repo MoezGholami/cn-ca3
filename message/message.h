@@ -17,11 +17,14 @@ const int router_interconnection_establish_type	=	6;
 const int router_interconnection_dc_type	=	7;
 const int router_interconnection_message_type 	=	8;
 const int router_dvmrp_prune_type		=	9;
+const int multicast_ip_intro_type		=	10;
 
 
 typedef struct message
 {
 	public:
+		message(void);
+		message(string sip, string dip, int mid, int mtype, int mttl, string bd);
 		string source_ip;
 		string destination_ip; //multicast or unicast
 		int id;	//id is not enough for identifying, should be + sender_ip,destination_ip
@@ -33,6 +36,6 @@ typedef struct message
 message message_from_string(string s);
 string string_from_message(const message &m);
 
-const message null_message=message_from_string("0\n0\n0\n0\n0\n0");
+const message null_message;
 
 #endif

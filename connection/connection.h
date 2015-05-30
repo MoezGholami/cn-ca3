@@ -23,7 +23,8 @@ const int buffer_size = 20480;
 //transparent of bidirectional asynchronous q&a connection
 //state of being not established / corrupted
 
-const int virgin_fd	=	-1;
+const int virgin_fd			=	-1;
+const int default_connection_cost	=	1;
 
 //yek bar masraf
 class connection
@@ -71,6 +72,7 @@ class connection
 		bool corrupted; //close as you set this
 		int cost;
 
+		void set_true_corrupted(void);
 		//we do not allow copy, and promise not to use them
 		connection(const connection &c);
 		connection& operator=(const connection &c);

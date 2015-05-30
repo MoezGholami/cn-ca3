@@ -1,5 +1,25 @@
 #include "message.h"
 
+message::message(void)
+{
+	source_ip="0";
+	destination_ip="0";
+	id=0;
+	type=0;
+	ttl=0;
+	body="";
+}
+
+message::message(string sip, string dip, int mid, int mtype, int mttl, string bd)
+{
+	source_ip=sip;
+	destination_ip=dip;
+	id=mid;
+	type=mtype;
+	ttl=mttl;
+	body=bd;
+}
+
 message message_from_string(string s)
 {
 	stringstream ss;

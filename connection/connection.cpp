@@ -5,6 +5,7 @@ connection::connection(void)
 	connection_fd=virgin_fd;
 	corrupted=false;
 	closed=false;
+	set_cost(default_connection_cost);
 }
 
 connection::connection(int fd)
@@ -13,12 +14,15 @@ connection::connection(int fd)
 	corrupted=false;
 	closed=false;
 	set_fd(fd);
+	set_cost(default_connection_cost);
 }
 
 connection::connection(int server_port_no, const string &server_ip_address)
 {
 	struct sockaddr_in serv_addr;
 	int status;
+
+	set_cost(default_connection_cost);
 
 	closed=false;
 	corrupted=true;
@@ -90,8 +94,7 @@ void connection::send_message(const message& sending)
 	{
 		cout<<"connection with fd: "<<connection_fd<<
 			", send error, corrupted.\n";
-		corrupted=true;
-		close();
+		set_true_corrupted();
 		return ;
 	}
 }
@@ -118,8 +121,7 @@ int connection::get_message(message& receiving)
 	{
 		cout<<"connection with fd: "<<connection_fd
 			<<"error reading, corrupted."<<endl;
-		corrupted=true;
-		close();
+		set_true_corrupted();
 		return n;
 	}
 	receiving_str=buff_read;
@@ -168,6 +170,12 @@ int connection::get_cost(void)
 void connection::set_cost(int c)
 {
 	cost=c;
+}
+
+void set_true_corrupted(void)
+{
+		corrupted=true;
+		close();
 }
 
 connection::connection(const connection &c)

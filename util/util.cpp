@@ -65,6 +65,6 @@ bool FileExist(const string &url)
 
 void clear_buff(char *x,size_t s)
 {
-	for(int i=0;i<s;i++)
+	for(size_t i=0;i<s;i++)
 		x[i] = 0;
 }
