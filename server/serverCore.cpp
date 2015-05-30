@@ -11,6 +11,21 @@ ServerCoreClerk::ServerCoreClerk(int port_num){
 	port = port_num;
 }
 
+void ServerCoreClerk::doClientCommand( int fd ){
+	message mssg;
+	int n,status;
+	n = read( fd, (char*)(&mssg), sizeof(mssg));
+	if( n<0 ){
+		cout<<"reading failed ..."<<endl;
+	}
+	status = mssg.type;
+	if(status == my_ip_intro_type ){
+		
+	}
+	s = write( fd, (char*)(&mssg), sizeof(mssg));
+	
+}
+
 int ServerCoreClerk::doServerCommand(){
 	string comm1,comm2;
 	cin>>comm1;

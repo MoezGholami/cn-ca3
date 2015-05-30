@@ -128,7 +128,8 @@ int main(int argn, char** args)
 						// the messages gotten from the clients-routers ...
 						
 						//TODO create wrapper
-						
+						scc.doClientCommand( it_fd );
+
 						//scc.forwardClientPacket(sendingPacket, it_fd);
 						//int s = write(it_fd, (char*)(&sendingPacket), sizeof(Packet));
 						//if(s < 0)
