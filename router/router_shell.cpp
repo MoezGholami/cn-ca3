@@ -29,6 +29,16 @@ void router_shell::do_router_shell_command(const string &command)
 		ss>>parse1>>parse2>>parse_int;
 		kernel.connect_to_router(parse1, parse2, parse_int);
 	}
+	else if(parse1=="Disconnect")
+	{
+		ss>>parse2;
+		kernel.delete_pin(parse2);
+	}
+	else if(parse1=="debug")
+	{
+		ss>>parse2;
+		kernel.send_debug_message(parse2);
+	}
 	else
 	{
 	}
@@ -45,4 +55,9 @@ int router_shell::get_new_client_like_connection_fd()
 int router_shell::handle_message_of_fd(int fd)
 {
 	return kernel.handle_message_of_fd(fd);
+}
+
+void router_shell::inform_running_port(int p)
+{
+	kernel.inform_running_port(p);
 }

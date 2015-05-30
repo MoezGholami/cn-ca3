@@ -9,6 +9,7 @@
 #include <cassert>
 #include "../connection/connection.h"
 #include "../message/message.h"
+#include "../util/util.h"
 
 using namespace std;
 
@@ -28,17 +29,22 @@ class router_kernel
 		void add_pin(pin p);
 		void delete_pin(pin p);
 		void change_local_cost(pin p, int new_cost);
-		void connect_to_router(pin mine, pine others, int other_port);
+		void connect_to_router(pin mine, pin others, int other_port);
 
 		//if returns 0, it means the connection is closed and
 		//the fd should be removed from fd_set
 		//normally returns something not equal to zero
 		int handle_message_of_fd(int fd);
 
+		void send_debug_message(pin p);
+		void inform_running_port(int p);
+
 	private:
 		vector<pin> pins; //caution: readundent but for easy checking.
 		map<pin, int> pin_local_cost;
 		map<pin, vector<connection*> > pin_connections;
+		int debug_message_count;
+		int my_running_port;	//used for debugging
 
 		void update_pin_cost(pin p);	//talk to peer to get the new cost of the pin
 
@@ -49,6 +55,8 @@ class router_kernel
 
 		int handle_new_connection(int new_fd);
 		void handle_closing_connection(connection *con_ptr);
+
+		void handle_message(connection *con_ptr, message &m);
 };
 
 #endif

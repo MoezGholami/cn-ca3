@@ -23,6 +23,7 @@ const int buffer_size = 20480;
 //transparent of bidirectional asynchronous q&a connection
 //state of being not established / corrupted
 
+const string local_host_ip_address	=	"127.0.0.1";
 const int virgin_fd			=	-1;
 const int default_connection_cost	=	1;
 
@@ -32,7 +33,7 @@ class connection
 	public:
 		connection(void);
 		connection(int fd);
-		connection(int server_port_no, const string &server_ip_address="127.0.0.1");
+		connection(int server_port_no, const string &server_ip_address);
 		~connection(void);
 
 		void close(void);

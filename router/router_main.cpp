@@ -37,6 +37,7 @@ int main(int argc, char* argv[])
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.s_addr = INADDR_ANY;
 	server_addr.sin_port = htons(port_number);
+	shell.inform_running_port(port_number);
 
 	cout<<"Listening from socket ...\n";
 

@@ -1,12 +1,12 @@
 #include "router_kernel.h"
 
-router_kernel(void)
+router_kernel::router_kernel(void)
 {
 	add_pin(base_pin);
 	cout<<"the base pin which clients are connected is: "<<base_pin<<endl;
 }
 
-~router_kernel(void)
+router_kernel::~router_kernel(void)
 {
 	vector<pin> pin_copy=pins;
 	for(unsigned i=0; i<pin_copy.size(); ++i)
@@ -63,7 +63,7 @@ void router_kernel::update_pin_cost(pin p)
 	//need connection of the pin
 }
 
-void connect_to_router(pin mine, pine others, int other_port)
+void router_kernel::connect_to_router(pin mine, pin others, int other_port)
 {
 	message receiving;
 	connection *con_ptr;
@@ -71,14 +71,15 @@ void connect_to_router(pin mine, pine others, int other_port)
 	if(find(pins.begin(), pins.end(), mine)==pins.end())
 	{
 		cout<<"do not have such pin: "<<mine<<endl;
-		return 0;
+		return ;
 	}
 
-	con_ptr = new connection(other_port);
+	con_ptr = new connection(other_port, local_host_ip_address);
 
 	if(!con_ptr->is_ok_to_communicate())
 		return ;
 
+	con_ptr->send_message(message("0","0",0,router_interconnection_establish_type,1,others));
 	con_ptr->get_message(receiving);
 
 	if(!con_ptr->is_ok_to_communicate())
@@ -87,8 +88,8 @@ void connect_to_router(pin mine, pine others, int other_port)
 		return ;
 	}
 
-	pin_connections.push_back(con_ptr);
-	update_pin_cost();
+	pin_connections[mine].push_back(con_ptr);
+	update_pin_cost(mine);//TODO: replace with set connection cost
 }
 
 int router_kernel::handle_message_of_fd(int fd)
@@ -98,7 +99,7 @@ int router_kernel::handle_message_of_fd(int fd)
 
 	if(con_ptr==0)
 	{
-		return handle_new_connection(int fd);
+		return handle_new_connection(fd);
 	}
 	con_ptr->get_message(receiving);
 	if(con_ptr->is_closed())
@@ -107,8 +108,38 @@ int router_kernel::handle_message_of_fd(int fd)
 		return 0;
 	}
 
-	//TODO: complete this
+	handle_message(con_ptr, receiving);
 	return 2;
+}
+
+void router_kernel::send_debug_message(pin p)
+{
+	vector<connection *> corrupteds;
+
+	message debug_message("0","0",++debug_message_count,router_interconnection_debug_type,1,"some"), response;
+	if(find(pins.begin(), pins.end(), p)==pins.end())
+	{
+		cout<<"no such pin\n";
+		return ;
+	}
+	for(unsigned i=0; i<pin_connections[p].size(); ++i)
+	{
+		response=pin_connections[p][i]->send_q_get_a(debug_message);
+		if(response==null_message)
+		{
+			cout<<"connection corrupted.\n";
+			corrupteds.push_back(pin_connections[p][i]);
+		}
+		else
+			cout<<response.body<<endl;
+	}
+	for(unsigned i=0; i<corrupteds.size(); ++i)
+		handle_closing_connection(corrupteds[i]);
+}
+
+void router_kernel::inform_running_port(int p)
+{
+	my_running_port=p;
 }
 
 pin router_kernel::pin_of_fd(int fd)
@@ -116,7 +147,7 @@ pin router_kernel::pin_of_fd(int fd)
 	for(map<pin, vector<connection *> >::iterator it=pin_connections.begin();
 			it!=pin_connections.end(); ++it)
 		for(unsigned i=0; i<(it->second).size(); ++i)
-			if((it->second)[i].get_fd()==fd)
+			if((it->second)[i]->get_fd()==fd)
 				return it->first;
 	return null_pin;
 }
@@ -136,12 +167,12 @@ connection* router_kernel::connection_ptr_of_fd(int fd)
 	for(map<pin, vector<connection *> >::iterator it=pin_connections.begin();
 			it!=pin_connections.end(); ++it)
 		for(unsigned i=0; i<(it->second).size(); ++i)
-			if((it->second)[i].get_fd()==fd)
+			if((it->second)[i]->get_fd()==fd)
 				return ((it->second)[i]);
 	return (connection *)0;
 }
 
-int connection::handle_new_connection(int new_fd)
+int router_kernel::handle_new_connection(int new_fd)
 {
 	message receiving;
 	pin p;
@@ -170,7 +201,7 @@ int connection::handle_new_connection(int new_fd)
 	return 1;
 }
 
-void handle_closing_connection(connection *con_ptr)
+void router_kernel::handle_closing_connection(connection *con_ptr)
 {
 	pin parent;
 
@@ -178,7 +209,16 @@ void handle_closing_connection(connection *con_ptr)
 
 	assert(parent!=null_pin);
 
-	pin_connections[p].erase(find(pin_connections[p].begin(), pin_connections[p].end(), con_ptr));
+	pin_connections[parent].erase(find(pin_connections[parent].begin(), pin_connections[parent].end(), con_ptr));
 
 	delete con_ptr;
+}
+
+void router_kernel::handle_message(connection *con_ptr, message &m)
+{
+	if(m.type==router_interconnection_debug_type)
+	{
+		con_ptr->send_message(message("0","0",m.id,m.type,m.ttl,"i'm on port: "+toString(my_running_port)+
+					"i've got your message with id "+toString(m.id)+"\n"));
+	}
 }

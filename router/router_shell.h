@@ -22,6 +22,8 @@ class router_shell
 
 		int get_new_client_like_connection_fd();
 
+		void inform_running_port(int p);//only for debugging
+
 	private:
 		router_kernel kernel;
 

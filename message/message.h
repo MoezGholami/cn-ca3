@@ -14,7 +14,7 @@ const int membership_query_type			=	3;
 const int membership_report_type		=	4;
 const int membership_leave_type			=	5;
 const int router_interconnection_establish_type	=	6;
-const int router_interconnection_dc_type	=	7;
+const int router_interconnection_debug_type	=	7;
 const int router_interconnection_message_type 	=	8;
 const int router_dvmrp_prune_type		=	9;
 const int multicast_ip_intro_type		=	10;
@@ -35,6 +35,9 @@ typedef struct message
 
 message message_from_string(string s);
 string string_from_message(const message &m);
+
+bool operator==(const message& m, const message &n);
+bool operator!=(const message& m, const message &n);
 
 const message null_message;
 

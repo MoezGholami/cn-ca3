@@ -66,3 +66,20 @@ string string_from_message(const message &m)
 
 	return result;
 }
+
+bool operator==(const message& m, const message &n)
+{
+	return 
+		(m.source_ip==n.source_ip) &&
+		(m.destination_ip==n.destination_ip) &&
+		(m.id==n.id) &&
+		(m.type==n.type) &&
+		//(m.ttl==n.ttl) &&
+		(m.body==n.body)
+		;
+}
+
+bool operator!=(const message& m, const message &n)
+{
+	return !(m==n);
+}

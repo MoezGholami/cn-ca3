@@ -172,7 +172,7 @@ void connection::set_cost(int c)
 	cost=c;
 }
 
-void set_true_corrupted(void)
+void connection::set_true_corrupted(void)
 {
 		corrupted=true;
 		close();
