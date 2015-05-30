@@ -26,8 +26,6 @@ class router_shell
 
 	private:
 		router_kernel kernel;
-
-		int new_client_like_connection_fd;
 };
 
 #endif

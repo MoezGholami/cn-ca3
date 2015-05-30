@@ -17,12 +17,6 @@ using namespace std;
 
 const int buffer_size = 20480;
 
-//TODO: what is connection???
-//constructor? given from (as server)???
-//proper destructor
-//transparent of bidirectional asynchronous q&a connection
-//state of being not established / corrupted
-
 const string local_host_ip_address	=	"127.0.0.1";
 const int virgin_fd			=	-1;
 const int default_connection_cost	=	1;

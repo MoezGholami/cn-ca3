@@ -41,12 +41,16 @@ class router_kernel
 		void send_debug_message(pin p);
 		void inform_running_port(int p);
 
+		//only once
+		int get_new_client_like_connection_fd();
+
 	private:
 		vector<pin> pins; //caution: readundent but for easy checking.
 		map<pin, int> pin_local_cost;
 		map<pin, vector<connection*> > pin_connections;
 		int debug_message_count;
 		int my_running_port;	//used for debugging
+		int new_client_like_connection_fd;
 
 		void update_pin_cost(pin p);	//talk to peer to get the new cost of the pin
 		void synch_connection_new_local_cost(connection *con_ptr, int cost); //talk to one peer

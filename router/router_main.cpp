@@ -22,7 +22,7 @@ const int num_of_connection = 10;
 
 int main(int argc, char* argv[])
 {
-	int port_number, server_fd, binding_st, listening_st, new_sock_fd, it_fd, status;
+	int port_number, server_fd, binding_st, listening_st, new_sock_fd, it_fd, status, new_cl_fd;
 	struct sockaddr_in server_addr;
 	struct timeval tv;
 	string stdin_line;
@@ -85,6 +85,9 @@ int main(int argc, char* argv[])
 					//read from stdin
 					getline(cin, stdin_line);
 					shell.do_router_shell_command(stdin_line);
+					new_cl_fd=shell.get_new_client_like_connection_fd();
+					if(new_cl_fd!=virgin_fd)
+						FD_SET(new_cl_fd, &read_fdset);
 				}
 				else if(it_fd == server_fd)
 				{	
