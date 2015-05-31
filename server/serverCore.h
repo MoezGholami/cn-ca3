@@ -1,5 +1,5 @@
-#ifndef __SIAMOZ__switchCore
-#define __SIAMOZ__switchCore
+#ifndef __SIAMOZ__serverCore
+#define __SIAMOZ__serverCore
 
 #include <string>
 #include <map>
