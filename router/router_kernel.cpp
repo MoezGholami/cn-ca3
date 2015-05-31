@@ -296,6 +296,7 @@ void router_kernel::handle_message(connection *con_ptr, message &m)
 	}
 	if(m.type==unicast_message_type || m.type==multicast_ip_intro_type)
 	{
+		cerr<<"in handle messeage: new gotten message (unicast or multi intro): "<<m.body<<endl;
 		update_tables(con_ptr, m);
 		forward_unicast_message(con_ptr,m);
 	}
@@ -347,7 +348,7 @@ void router_kernel::handle_router_cost_message(connection *con_ptr, const messag
 
 void router_kernel::update_tables(connection *con_ptr, const message &m)
 {
-	if(m.type==my_ip_intro_type || m.type==unicast_message_type || multicast_ip_intro_type)
+	if(m.type==my_ip_intro_type || m.type==unicast_message_type || m.type==multicast_ip_intro_type)
 		unicast_routing_table[m.source_ip]=con_ptr;
 }
 
@@ -369,6 +370,7 @@ void router_kernel::forward_unicast_message(connection *con_ptr,message &m)
 				handle_closing_connection(unicast_routing_table[m.destination_ip]);
 				return ;
 			}
+			cerr<<"found, forwarding\n";
 			unicast_routing_table[m.destination_ip]->send_message(m);
 			if(! unicast_routing_table[m.destination_ip]->is_ok_to_communicate())
 			{
@@ -378,7 +380,10 @@ void router_kernel::forward_unicast_message(connection *con_ptr,message &m)
 		}
 	}
 	else
+	{
+		cerr<<"not found, broadcasting.\n";
 		broadcast(m, con_ptr);
+	}
 }
 
 void router_kernel::broadcast(const message &m, connection *exception)

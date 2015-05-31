@@ -36,13 +36,14 @@ class SIP {
 
 class ServerCoreClerk{
 	public:
-	ServerCoreClerk(int port_num);	
+	ServerCoreClerk(int port_num,string gip);	
 	int doServerCommand();
 	void doClientCommand(int fd);
 	private:
 	vector<SIP*> sip_vector;
 	int port;
 	connection* cn;
+	string general_IP;
 	int global_mid;
 };
 

@@ -20,13 +20,13 @@ int main(int argn, char** args)
 	//char *directory_name = args[2];
 	int server_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	struct sockaddr_in server_addr;
-	string xx = args[1];
+	string general_IP = args[1];
+	cout<<"server IP="<<general_IP<<endl;
 	server_addr.sin_family = AF_INET;
 	//server_addr.sin_addr.s_addr = INADDR_ANY;
 	server_addr.sin_addr.s_addr = inet_addr(args[1]);
-	cout<<"serverip"<<server_addr.sin_addr.s_addr << endl;
 	server_addr.sin_port = htons(port_number);
-	ServerCoreClerk scc(port_number);
+	ServerCoreClerk scc(port_number,general_IP);
 	string capu;
 
 	char res_buff[STR_SIZE];
@@ -86,6 +86,7 @@ int main(int argn, char** args)
 					new_sock_s = scc.doServerCommand();	
 					if( new_sock_s != -1){
 						FD_SET(new_sock_s, &read_fdset);
+						cout<<"Added to FD_SET"<<endl;
 					}
 				}
 				else if(it_fd == server_fd)
@@ -102,44 +103,21 @@ int main(int argn, char** args)
 				}
 				else
 				{
-					int n, m;
-					char buff_read [STR_SIZE], response_buff[STR_SIZE];
-					clear_buff(buff_read, STR_SIZE);
-					clear_buff(response_buff, STR_SIZE);
-					n = read(it_fd,res_buff, STR_SIZE);
-					if(n == 0)
+	
+					//TODO create wrapper
+						scc.doClientCommand( it_fd );
+					//scc.forwardClientPacket(sendingPacket, it_fd);
+					//int s = write(it_fd, (char*)(&sendingPacket), sizeof(Packet));
+					//if(s < 0)
+					//	cerr<<"send reply error\n";
+					/*else if(mystrcmp(buff_read, "DC") == 0)
 					{
+						write(it_fd, "Disconnecting in Progress ...\n",
+								sizeof("Disconnecting in Progress ...\n"));
 						close(it_fd);
 						FD_CLR(it_fd, &read_fdset);
-						// TODO remove it from fds .........
-						cerr<<"client out"<<endl;
-					}
-					else if(n < 0)
-					{
-						cerr<<"Error reading"<<endl;
-					}
-
-					//after reading successfully
-					else
-					{
-						// the messages gotten from the clients-routers ...
-						
-						//TODO create wrapper
-						scc.doClientCommand( it_fd );
-
-						//scc.forwardClientPacket(sendingPacket, it_fd);
-						//int s = write(it_fd, (char*)(&sendingPacket), sizeof(Packet));
-						//if(s < 0)
-						//	cerr<<"send reply error\n";
-						/*else if(mystrcmp(buff_read, "DC") == 0)
-						{
-							write(it_fd, "Disconnecting in Progress ...\n",
-									sizeof("Disconnecting in Progress ...\n"));
-							close(it_fd);
-							FD_CLR(it_fd, &read_fdset);
-							write(STDOUT, "Removing One Client_fd\n", sizeof("Removing One Client_fd\n"));
-						}*/
-					}
+						write(STDOUT, "Removing One Client_fd\n", sizeof("Removing One Client_fd\n"));
+					}*/
 				}
 			}
 		}
