@@ -294,7 +294,7 @@ void router_kernel::handle_message(connection *con_ptr, message &m)
 		handle_router_message(con_ptr, m);
 		return ;
 	}
-	if(m.type==unicast_message_type)
+	if(m.type==unicast_message_type || m.type==multicast_ip_intro_type)
 	{
 		update_tables(con_ptr, m);
 		forward_unicast_message(con_ptr,m);
@@ -347,7 +347,7 @@ void router_kernel::handle_router_cost_message(connection *con_ptr, const messag
 
 void router_kernel::update_tables(connection *con_ptr, const message &m)
 {
-	if(m.type==my_ip_intro_type || m.type==unicast_message_type)
+	if(m.type==my_ip_intro_type || m.type==unicast_message_type || multicast_ip_intro_type)
 		unicast_routing_table[m.source_ip]=con_ptr;
 }
 
