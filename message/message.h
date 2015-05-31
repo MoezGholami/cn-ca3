@@ -22,8 +22,12 @@ const int unicast_message_type			=	13;
 const int membership_report_type		=	4;
 const int membership_leave_type			=	5;
 
+const int membership_is_member_type		=	20;
+const int membership_i_join_u_type		=	21;
+
 
 const int multicast_ip_intro_type		=	10;
+
 typedef struct message
 {
 	public:

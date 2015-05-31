@@ -54,6 +54,9 @@ class router_kernel
 		map<string, connection*> unicast_routing_table;
 		map<string, vector<connection *> > multicast_routing_table;
 
+		map<string ,connection *> pending_volunteer; //mip -> con_ptr a volunteer for this mip
+		map<string, connection *> prev_hop_from_source; // the next hop to source which informed he can be in the path
+
 		int debug_message_count;
 		int my_running_port;	//used for debugging
 		int new_client_like_connection_fd;
@@ -75,9 +78,17 @@ class router_kernel
 		void handle_router_message(connection *con_ptr, const message &m);
 		void handle_router_cost_message(connection *con_ptr, const message &m);
 
+		void handle_memebership_report(connection *con_ptr, message &m);
+		void answer_to_a_member_of_multicast(connection *con_ptr, message &m);
+		void handle_labbayk(connection *con_ptr, message &m);
+		void answer_to_leave(connection *con_ptr, message &m);
+
 		void update_tables(connection *con_ptr, const message &m);
+		void add_multicast_which_i_am_connected(const message &m);
+		bool connected_to_multicast_group(const string &mip);
 
 		void forward_unicast_message(connection *con_ptr,message &m);
+		void forward_multicast_message(message &m);
 
 		void broadcast(const message &m, connection *exception=0);
 };
