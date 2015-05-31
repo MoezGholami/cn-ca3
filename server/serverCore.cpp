@@ -72,11 +72,9 @@ void ServerCoreClerk::doClientCommand( int fd ){
 					cn->send_message(reply);
 				}
 			}
-		} else if( ){
-
 		}
 	}else {
-		cout<<"No default type found:"<<body<<endl;
+		cout<<"No default type found:"<<status<<"&&"<<body<<endl;
 	}
 	//	s = write( fd, (char*)(&mssg), sizeof(mssg));
 	
