@@ -354,7 +354,7 @@ void router_kernel::answer_to_leave(connection *con_ptr, message &m)
 			multicast_routing_table[mip].end(), con_ptr));
 	if(multicast_routing_table[mip].size()==0)
 	{
-		prev_hop_from_source[mip]->send_message(message("0","0",1,membership_leave_type,1,m.body));
+		prev_hop_from_source[mip]->send_message(message("0","0",1,membership_leave_type,10,m.body));
 		prev_hop_from_source.erase(mip);
 		multicast_routing_table.erase(mip);
 	}
@@ -546,6 +546,8 @@ void router_kernel::forward_multicast_message(message &m)
 
 void router_kernel::broadcast(const message &m, connection *exception)
 {
+	if(m.ttl==0)
+		return ;
 	for(map<pin, vector<connection *> >::iterator it=pin_connections.begin();
 			it!=pin_connections.end(); ++it)
 		for(unsigned i=0; i<(it->second).size(); ++i)
