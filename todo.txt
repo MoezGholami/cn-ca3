@@ -1,0 +1,2 @@
+duplicate message --> message id
+multicast router down
