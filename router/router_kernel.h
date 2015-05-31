@@ -77,7 +77,7 @@ class router_kernel
 
 		void update_tables(connection *con_ptr, const message &m);
 
-		void handle_unicast_message(connection *con_ptr,message &m);
+		void forward_unicast_message(connection *con_ptr,message &m);
 
 		void broadcast(const message &m, connection *exception=0);
 };

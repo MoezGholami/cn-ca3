@@ -240,10 +240,6 @@ int router_kernel::handle_new_connection(int new_fd)
 void router_kernel::handle_closing_connection(connection *con_ptr)
 {
 	pin parent;
-	map<string, connection *>::iterator it1;
-	map<string, vector<connection *> >::iterator it2;
-	unsigned it3;
-	int deleting_idx=-1;
 
 	parent=pin_of_connection_ptr(con_ptr);
 
@@ -254,19 +250,19 @@ void router_kernel::handle_closing_connection(connection *con_ptr)
 
 	pin_connections[parent].erase(find(pin_connections[parent].begin(), pin_connections[parent].end(), con_ptr));
 
-	for(it1=unicast_routing_table.begin();it1!=unicast_routing_table.end();)
+	for(map<string, connection *>::iterator it1=unicast_routing_table.begin();it1!=unicast_routing_table.end();)
 		if(it1->second==con_ptr)
 			unicast_routing_table.erase(it1++);
 		else
 			++it1;
 
-	for(it2=multicast_routing_table.begin(); it2!=multicast_routing_table.end() && deleting_idx==-1; ++it2)
-		for(it3=0; it3<(it2->second).size() && deleting_idx==-1; ++it3)
-			if((it2->second)[it3]==con_ptr)
-				deleting_idx=(int)it3;
+	for(map<string, vector<connection *> >::iterator it2=multicast_routing_table.begin(); it2!=multicast_routing_table.end(); ++it2)
+		for(vector<connection *>::iterator it3=(it2->second).begin(); it3!=(it2->second).end(); ++it3)
+			if(*it3==con_ptr)
+				(it2->second).erase(it3++);
+			else
+				++it3;
 
-	if(deleting_idx!=-1)
-		(it2->second).erase((it2->second).begin()+deleting_idx);
 
 	delete con_ptr;
 }
@@ -301,7 +297,7 @@ void router_kernel::handle_message(connection *con_ptr, message &m)
 	if(m.type==unicast_message_type)
 	{
 		update_tables(con_ptr, m);
-		handle_unicast_message(con_ptr,m);
+		forward_unicast_message(con_ptr,m);
 	}
 }
 
@@ -351,25 +347,34 @@ void router_kernel::handle_router_cost_message(connection *con_ptr, const messag
 
 void router_kernel::update_tables(connection *con_ptr, const message &m)
 {
-	unicast_routing_table[m.source_ip]=con_ptr;
+	if(m.type==my_ip_intro_type || m.type==unicast_message_type)
+		unicast_routing_table[m.source_ip]=con_ptr;
 }
 
-void router_kernel::handle_unicast_message(connection *con_ptr,message &m)
+void router_kernel::forward_unicast_message(connection *con_ptr,message &m)
 {
 	if(--m.ttl==0)
 		return ;
 	if(unicast_routing_table.find(m.destination_ip)!=unicast_routing_table.end())
 	{
-		if(! unicast_routing_table[m.destination_ip]->is_ok_to_communicate())
+		if(unicast_routing_table[m.destination_ip]==con_ptr)
 		{
-			handle_closing_connection(unicast_routing_table[m.destination_ip]);
-			return ;
+			unicast_routing_table.erase(m.destination_ip);
+			broadcast(m, con_ptr);
 		}
-		unicast_routing_table[m.destination_ip]->send_message(m);
-		if(! unicast_routing_table[m.destination_ip]->is_ok_to_communicate())
+		else
 		{
-			handle_closing_connection(unicast_routing_table[m.destination_ip]);
-			return ;
+			if(! unicast_routing_table[m.destination_ip]->is_ok_to_communicate())
+			{
+				handle_closing_connection(unicast_routing_table[m.destination_ip]);
+				return ;
+			}
+			unicast_routing_table[m.destination_ip]->send_message(m);
+			if(! unicast_routing_table[m.destination_ip]->is_ok_to_communicate())
+			{
+				handle_closing_connection(unicast_routing_table[m.destination_ip]);
+				return ;
+			}
 		}
 	}
 	else
