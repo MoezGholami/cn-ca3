@@ -51,7 +51,6 @@ void router_shell::do_router_shell_command(const string &command)
 	{
 		cout<<"command not recognized.\n";
 	}
-	//TODO: complete
 }
 
 int router_shell::get_new_client_like_connection_fd()

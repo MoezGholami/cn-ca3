@@ -41,7 +41,7 @@ class router_kernel
 		void send_debug_message(pin p);
 		void inform_running_port(int p);
 
-		void show_tables(void);//TODO: complete
+		void show_tables(void);
 
 		//only once
 		int get_new_client_like_connection_fd();

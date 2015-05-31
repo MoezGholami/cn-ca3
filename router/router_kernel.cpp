@@ -160,6 +160,27 @@ void router_kernel::send_debug_message(pin p)
 
 void router_kernel::show_tables(void)
 {
+	cout<<"unicast routing table: <string destination ip, connection * connection, Eth> :\n";
+	for(map<string, connection *>::iterator it=unicast_routing_table.begin();
+			it!=unicast_routing_table.end(); ++it)
+		cout<<it->first<<"\t"<<it->second<<"\t"<<pin_of_connection_ptr(it->second)<<endl;
+
+	cout<<"\n\n";
+	cout<<"multicast routing table: <string multicast ip, connection * local source, source Eth> :\n"
+		<<"vector<connection *> receivers: "<<endl;
+	for(map<string, vector<connection *> >::iterator it=multicast_routing_table.begin();
+			it!=multicast_routing_table.end(); ++it)
+	{
+		if(prev_hop_from_source.find(it->first)!=prev_hop_from_source.end())
+			cout<<it->first<<"\t"<<
+				prev_hop_from_source[it->first]<<"\t"<<
+				pin_of_connection_ptr(prev_hop_from_source[it->first])<<" :\n";
+		else
+			cout<<it->first<<"\t"<<"directly linked to group server :\n";
+		for(unsigned i=0; i<(it->second).size(); ++i)
+			cout<<(it->second)[i]<<endl;
+		cout<<endl;
+	}
 }
 
 void router_kernel::inform_running_port(int p)
