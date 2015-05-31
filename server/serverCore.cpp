@@ -38,7 +38,44 @@ void ServerCoreClerk::doClientCommand( int fd ){
 		cn->send_message(reply);
 	} else if( status == log_type ){
 		cout<<body<<endl;
-	} else {
+	} else if( status == unicast_message_type ) {
+		ss << body;
+		ss >> t1;
+		if( t1 == "Get" ){
+			ss >> t2;
+			ss >> t3;
+			if( t2 == "group" && t3 == "list" ){
+				string ggl="";
+				for(int i=0;i<sip_vector.size();i++){
+					ggl+=sip_vector[i]->group_name+" <-> "+sip_vector[i]->multicast_IP+"\n";
+				}
+				message reply(general_IP,mssg.source_ip,global_mid,unicast_message_type,10,ggl);
+				global_mid++;
+				cn->send_message(reply);
+			}
+		} else if( t1 == "Join"){
+			cout<<"Request for join ..."<<endl;
+			ss >> t2;
+			cout<<"Pending..."<<endl;
+			for(int i=0;i<sip_vector.size();i++){
+				if(sip_vector[i]-> group_name == t2){
+					cout<<"Group was found ..."<<endl;
+					message reply(general_IP,mssg.source_ip,global_mid,unicast_message_type,10,sip_vector[i]->multicast_IP);
+					global_mid++;
+					cn->send_message(reply);
+					break;
+				}
+				if(i == sip_vector.size()-1){
+					cout<<"Group was not found ..."<<endl;
+					message reply(general_IP,mssg.source_ip,global_mid,unicast_message_type,10,"404");
+					global_mid++;
+					cn->send_message(reply);
+				}
+			}
+		} else if( ){
+
+		}
+	}else {
 		cout<<"No default type found:"<<body<<endl;
 	}
 	//	s = write( fd, (char*)(&mssg), sizeof(mssg));
