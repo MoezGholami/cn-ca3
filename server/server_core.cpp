@@ -115,7 +115,7 @@ void server_core::handle_connction_message(void)
 string server_core::list_of_groups(void)
 {
 	string result;
-	result="list of groups: <name, unicast ip of group server, multicast ip of group>: ";
+	result="list of groups: <name, unicast ip of group server, multicast ip of group>: \n";
 
 	for(map<string, string>::iterator it=name2unicast.begin(); it!=name2unicast.end(); ++it)
 		result+=( (it->first)+"\t"+it->second+"\t"+name2multicast[it->first]+"\n" );
