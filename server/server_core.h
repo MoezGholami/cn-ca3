@@ -29,6 +29,7 @@ class server_core
 		map<string, string> name2multicast;
 
 		void handle_disconnection(void);
+		string list_of_groups(void);
 };
 
 #endif

@@ -53,10 +53,9 @@ void server_core::do_stdin_command(string line)
 
 void server_core::handle_connction_message(void)
 {
-	//TODO: change
 	message receiving;
 	stringstream ss;
-	string gname, guip, gmip;
+	string parse, gname, guip, gmip;
 
 	cn->get_message(receiving);
 	handle_disconnection();
@@ -86,18 +85,41 @@ void server_core::handle_connction_message(void)
 	else if(receiving.type==unicast_message_type)
 	{
 		cout<<"log: a new unicast message for me received\n";
-		ss>>gname;
-		if(name2unicast.find(gname)==name2unicast.end())
+		ss>>parse;
+		if(parse=="join")
 		{
-			cout<<"log: i did not find any group with name: "<<gname<<" in my memory.\n";
-			cn->send_message(message(unicast_ip, receiving.source_ip, receiving.id, unicast_message_type, max_ttl, "404"));
+			ss>>gname;
+			if(name2unicast.find(gname)==name2unicast.end())
+			{
+				cout<<"log: i did not find any group with name: "<<gname<<" in my memory.\n";
+				cn->send_message(message(unicast_ip, receiving.source_ip, receiving.id,
+							unicast_message_type, max_ttl, "404"));
+			}
+			else
+			{
+				cout<<"log: i found the ip s of group "<<gname<<endl;
+				cn->send_message(message(unicast_ip, receiving.source_ip, receiving.id, unicast_message_type, max_ttl,
+							"found "+gname+" "+name2unicast[gname]+" "+name2multicast[gname]));
+			}
 		}
 		else
 		{
-			cout<<"log: i found the ip s of group "<<gname<<endl;
+			cout<<"log: assuming we have got a show list\n";
 			cn->send_message(message(unicast_ip, receiving.source_ip, receiving.id, unicast_message_type, max_ttl,
-						gname+" "+name2unicast[gname]+" "+name2multicast[gname]));
+						"list "+list_of_groups()));
 		}
 	}
 	handle_disconnection();
+}
+
+string server_core::list_of_groups(void)
+{
+	string result;
+	result="list of groups: <name, unicast ip of group server, multicast ip of group>: ";
+
+	for(map<string, string>::iterator it=name2unicast.begin(); it!=name2unicast.end(); ++it)
+		result+=( (it->first)+"\t"+it->second+"\t"+name2multicast[it->first]+"\n" );
+
+	cout<<"log: list of groups where calculated, printing for you:\n"<<result<<endl<<endl;
+	return result;
 }

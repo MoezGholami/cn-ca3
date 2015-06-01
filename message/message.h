@@ -7,28 +7,27 @@
 
 using namespace std;
 
-const int null_message_type			=	0;
-const int default_message_type			=	1;
-const int my_ip_intro_type			=	2; //introduce my ip is..., body is empty
-const int membership_query_type			=	3;
-const int router_interconnection_establish_type	=	6;
-const int router_interconnection_debug_type	=	7;
-const int router_interconnection_message_type 	=	8;
-const int router_dvmrp_prune_type		=	9;
-const int log_type				=	11;
-const int multicast_message_type		= 	12;
-const int unicast_message_type			=	13;
-
-const int membership_report_type		=	4;
-const int membership_leave_type			=	5;
-
-const int membership_is_member_type		=	20;
-const int membership_i_join_u_type		=	21;
-
-
-const int multicast_ip_intro_type		=	10;
-
 const int max_ttl				=	10;
+
+const int null_message_type			=	0;
+
+const int router_interconnection_establish_type	=	1;
+const int router_interconnection_debug_type	=	2;
+const int router_interconnection_message_type 	=	3;
+
+const int unicast_message_type			=	10;
+const int multicast_message_type		= 	11;
+
+const int my_ip_intro_type			=	20; //introduce my ip is..., body is empty
+const int multicast_ip_intro_type		=	21;
+
+const int membership_report_type		=	30;
+const int membership_is_member_type		=	31;
+const int membership_i_join_u_type		=	32;
+const int membership_leave_type			=	33;
+
+
+
 
 typedef struct message
 {

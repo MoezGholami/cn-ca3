@@ -89,7 +89,7 @@ void group_server_core::handle_connction_message(void)
 		return ;
 	}
 	cout<<"log: unicast message got\n";
-	if(parse=="synch")
+	if(parse=="sync")
 	{
 		cout<<"log: type=synch\n";
 		cn->send_message(message(unicast_ip, receiving.source_ip, receiving.id, unicast_message_type, max_ttl, "synch dadi!"));
