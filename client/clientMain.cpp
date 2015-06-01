@@ -41,7 +41,6 @@ int main(int argn, char** args)
 	clear_buff(res_buff, STR_SIZE);
 	
 	cout<<"Listening from socket ...\n";
-	struct sockaddr_in client_addr;
 	//binding 
 	int binding_st = bind(server_fd,(struct sockaddr*) &server_addr, sizeof(server_addr));
 	if(binding_st == -1)
@@ -58,7 +57,6 @@ int main(int argn, char** args)
 	}
 	fd_set read_fdset, temp_fdset;
 	struct timeval tv;
-	int ret_val;
 	int new_sock_fd, it_fd;
 
 	/* Watch stdin (fd 0) to see when it has input. */
@@ -69,8 +67,6 @@ int main(int argn, char** args)
 	/* Wait up to five seconds. */
 	tv.tv_sec = 10 * 60;
 	tv.tv_usec = 0;
-
-	unsigned int size_of_client_addr = sizeof(client_addr);
 
 	int status;
 

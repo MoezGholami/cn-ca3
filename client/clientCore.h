@@ -1,5 +1,5 @@
 #ifndef __SIAMOZ__clientCore
-#define __SIAMOZ__clinetCore
+#define __SIAMOZ__clientCore
 
 #include <string>
 #include <map>
@@ -53,5 +53,3 @@ class ClientCoreClerk{
 
 
 #endif
-
-

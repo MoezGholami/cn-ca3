@@ -15,7 +15,6 @@ GroupServerCoreClerk::GroupServerCoreClerk(int port_num,string gn,string gip,str
 }
 
 void GroupServerCoreClerk::doClientCommand(int fd){
-	int n;
 	message mssg;
 	stringstream ss;
 	string body,t1;
@@ -48,9 +47,7 @@ void GroupServerCoreClerk::doClientCommand(int fd){
 
 int GroupServerCoreClerk::doServerCommand(){
 	string comm1,comm2;
-	int port;
 	cin>>comm1;
-	int portNu;
 	if(comm1 == "Connect"){
 		cin>>comm2;
 		if(comm2 == "Router"){
@@ -60,7 +57,6 @@ int GroupServerCoreClerk::doServerCommand(){
 				cout<<"General IP must be set."<<endl;
 				return -1;
 			}
-			int n, m;//return value of read/write calls
 			cn = new connection(temp, local_host_ip_address );
 			if( cn->is_ok_to_communicate() ){
 				cout<<"connected successfuly"<<endl;
@@ -86,7 +82,6 @@ int GroupServerCoreClerk::doServerCommand(){
 		}
 		flag_set = true;
 	} else if( comm1 == "Add"){
-		int s;
 		cin>> comm2;
 		if( comm2 == "server"){
 			if(!flag_set){

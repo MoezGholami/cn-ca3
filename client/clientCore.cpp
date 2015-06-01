@@ -41,11 +41,9 @@ void ClientCoreClerk::doClientCommand( int fd ){
 int ClientCoreClerk::doServerCommand(){
 	string comm1,comm2;
 	cin>>comm1;
-	int portNu;
 	if(comm1 == "Connect"){
 		cin>>comm2;
 		if(comm2 == "Router"){
-			int n, m;//return value of read/write calls
 			int temp;
 			cin >> temp;
 			cn = new connection(temp, local_host_ip_address );
