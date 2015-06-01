@@ -21,7 +21,6 @@ int main(int argn, char** args)
 		port_number = atoi(args[4]);
 //	else 
 //		port_number = 2020; // default
-	const int num_of_connection = 4;
 	//string mac = args[2];
 	//char *directory_name = args[2];
 	int server_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -42,19 +41,6 @@ int main(int argn, char** args)
 	
 	cout<<"Listening from socket ...\n";
 	//binding 
-	int binding_st = bind(server_fd,(struct sockaddr*) &server_addr, sizeof(server_addr));
-	if(binding_st == -1)
-	{
-		cerr<<"bind error\n";
-		return -1;
-	}
-	//listenning
-	int listening_st = listen(server_fd, num_of_connection);
-	if(listening_st == -1)
-	{
-		cerr<<"listen error\n";
-		return -2;
-	}
 	fd_set read_fdset, temp_fdset;
 	struct timeval tv;
 	int new_sock_fd, it_fd;

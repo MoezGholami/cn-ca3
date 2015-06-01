@@ -20,7 +20,6 @@ int main(int argn, char** args)
 	server_IP = args[2];
 	group_name = args[1];
 	cout<<"Group IP = "<<general_IP<<endl;
-	const int num_of_connection = 4;
 	int server_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	struct sockaddr_in server_addr;
 	server_addr.sin_family = AF_INET;
@@ -34,20 +33,6 @@ int main(int argn, char** args)
 	clear_buff(res_buff, STR_SIZE);
 	
 	cout<<"Listening from socket ...\n";
-	//binding 
-	int binding_st = bind(server_fd,(struct sockaddr*) &server_addr, sizeof(server_addr));
-	if(binding_st == -1)
-	{
-		cerr<<"bind error\n";
-		return -1;
-	}
-	//listenning
-	int listening_st = listen(server_fd, num_of_connection);
-	if(listening_st == -1)
-	{
-		cerr<<"listen error\n";
-		return -2;
-	}
 	fd_set read_fdset, temp_fdset;
 	struct timeval tv;
 	int new_sock_fd, it_fd;
