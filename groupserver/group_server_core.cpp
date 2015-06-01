@@ -58,8 +58,10 @@ void group_server_core::do_stdin_command(string line)
 	ss>>parse;
 	if(parse=="add" || parse=="Add")
 	{
-		cn->send_message(message(unicast_ip, server_ip, 1, multicast_ip_intro_type, 10, name+" "+unicast_ip+" "+multicast_ip));
+		cn->send_message(message(unicast_ip, server_ip, 1, multicast_ip_intro_type, max_ttl,
+					name+" "+unicast_ip+" "+multicast_ip));
 		handle_disconnection();
+		cout<<"identification request was sent to the server\n";
 	}
 	else
 	{
@@ -81,16 +83,22 @@ void group_server_core::handle_connction_message(void)
 
 	if(receiving.type!=unicast_message_type)
 		return ;
+	if(receiving.destination_ip!=unicast_ip)
+	{
+		cout<<"log: a unicast message got, but not for me.\n";
+		return ;
+	}
 	cout<<"log: unicast message got\n";
 	if(parse=="synch")
 	{
 		cout<<"log: type=synch\n";
-		cn->send_message(message(unicast_ip, receiving.source_ip, receiving.id, unicast_message_type, 10, "synch dadi!"));
+		cn->send_message(message(unicast_ip, receiving.source_ip, receiving.id, unicast_message_type, max_ttl, "synch dadi!"));
 	}
 	else
 	{
 		cout<<"log: type=multicasting\n";
-		cn->send_message(message(unicast_ip, multicast_ip, 1, multicast_message_type, 10, receiving.body));
+		cn->send_message(message(unicast_ip, multicast_ip, 1, multicast_message_type, max_ttl,
+					"a message to group "+name+":\n"+receiving.body));
 	}
 	handle_disconnection();
 }

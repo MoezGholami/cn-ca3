@@ -28,6 +28,8 @@ const int membership_i_join_u_type		=	21;
 
 const int multicast_ip_intro_type		=	10;
 
+const int max_ttl				=	10;
+
 typedef struct message
 {
 	public:

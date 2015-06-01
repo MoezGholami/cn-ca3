@@ -10,7 +10,7 @@
 #include <cstdlib>
 #include <string>
 #include "../connection/connection.h"
-#include "group_server_core.h"
+#include "server_core.h"
 
 using namespace std;
 
@@ -24,23 +24,19 @@ int main(int argc, char* argv[])
 	int it_fd, status, router_port;
 	struct timeval tv;
 	fd_set read_fdset, temp_fdset;
-	string stdin_line, name, unicast_ip, multicast_ip, server_ip;
+	string stdin_line, unicast_ip;
 
-	if(argc<6)
+	if(argc<3)
 	{
 		cout<<"too few arguments, "<<"list of requierd arguments:\n";
-		cout<<"name\n"<<"my unicast ip\n"<<"my multicast ip\n"<<
-			"my router port (immediately connecting to port)\n"<<"my server ip (connected after Add server)\n";
+		cout<<"my unicast ip\n"<<"my router port (immediately connecting to port)\n";
 		return -1;
 	}
 
-	name=argv[1];
-	unicast_ip=argv[2];
-	multicast_ip=argv[3];
-	router_port=atoi(argv[4]);
-	server_ip=argv[5];
+	unicast_ip=argv[1];
+	router_port=atoi(argv[2]);
 
-	group_server_core core(name, unicast_ip, multicast_ip, server_ip, router_port);
+	server_core core(unicast_ip, router_port);
 
 	/* Watch stdin (fd 0) to see when it has input. */
 	FD_ZERO(&read_fdset);

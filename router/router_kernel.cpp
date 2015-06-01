@@ -353,7 +353,7 @@ void router_kernel::answer_to_leave(connection *con_ptr, message &m)
 			multicast_routing_table[mip].end(), con_ptr));
 	if(multicast_routing_table[mip].size()==0)
 	{
-		prev_hop_from_source[mip]->send_message(message("0","0",1,membership_leave_type,10,m.body));
+		prev_hop_from_source[mip]->send_message(message("0","0",1,membership_leave_type,max_ttl,m.body));
 		prev_hop_from_source.erase(mip);
 		multicast_routing_table.erase(mip);
 	}
@@ -378,7 +378,7 @@ void router_kernel::handle_labbayk(connection *con_ptr, message &m)
 	}
 	multicast_routing_table[mip]=vector<connection *>();
 	multicast_routing_table[mip].push_back(con_ptr);
-	prev_hop_from_source[mip]->send_message(message("0","0",1,membership_i_join_u_type,10,m.body));
+	prev_hop_from_source[mip]->send_message(message("0","0",1,membership_i_join_u_type,max_ttl,m.body));
 
 	if(!prev_hop_from_source[mip]->is_ok_to_communicate())
 		cout<<"wtf error on joining\n";
@@ -401,7 +401,7 @@ void router_kernel::answer_to_a_member_of_multicast(connection *con_ptr, message
 	else
 		return ;
 	//if it's not member but got membership_is_member_type, has pending volunteer
-	pending_volunteer[mip]->send_message(message("0","0",1,membership_is_member_type,10,m.body));
+	pending_volunteer[mip]->send_message(message("0","0",1,membership_is_member_type,max_ttl,m.body));
 	handle_closing_connection(pending_volunteer[mip]);
 	pending_volunteer.erase(mip);
 }
@@ -418,7 +418,7 @@ void router_kernel::handle_memebership_report(connection *con_ptr, message &m)
 		return ;
 	if(connected_to_multicast_group(mip))
 	{
-		con_ptr->send_message(message("0","0",1,membership_is_member_type,10,m.body));
+		con_ptr->send_message(message("0","0",1,membership_is_member_type,max_ttl,m.body));
 		handle_closing_connection(con_ptr);
 	}
 	else
@@ -489,9 +489,15 @@ void router_kernel::add_multicast_which_i_am_connected(const message &m)
 	string parse;
 
 	ss<<m.body;
-	ss>>parse>>parse>>parse;
+	ss>>parse>>parse>>parse;//assume the third part is the multicast ip address
 	if(connected_to_multicast_group(parse))
 		return ;
+	if(m.ttl!=max_ttl)
+	{
+		cout<<"log: i'm not directly connected to the multicast group: "<<parse<<"\n";
+		return ;
+	}
+	cout<<"log: i am directly connected to the multicast group: "<<parse<<"\n";
 	multicast_routing_table[parse]=vector<connection *>();
 	multicast_routing_table[parse].push_back(0);//this multicast member ship will never delete
 }
