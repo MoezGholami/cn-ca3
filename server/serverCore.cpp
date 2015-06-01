@@ -1,5 +1,6 @@
 #include "serverCore.h"
 
+//
 SIP::SIP(string sip,string mip,string gn){
 	server_IP = sip;
 	multicast_IP = mip;
