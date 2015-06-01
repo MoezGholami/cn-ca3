@@ -98,9 +98,13 @@ int ClientCoreClerk::doServerCommand(){
 					cout<<"Group does not exist."<<endl;
 					return -1;
 				}
+				stringstream ss;
+				ss<<reply.body;
+				string mip, sip;
+				ss>>mip>>sip;
 				global_mid = reply.id + 1;
 				cout<<"Group was found ..."<<endl;
-				message rx(general_IP,server_IP,global_mid,membership_report_type,10,reply.body);
+				message rx(general_IP,server_IP,global_mid,membership_report_type,10,mip);
 				global_mid++;
 				cn->send_message(rx);
 				cerr<<"OS"<<endl;
@@ -110,8 +114,9 @@ int ClientCoreClerk::doServerCommand(){
 					cn->get_message(reply2);
 				}
 				global_mid = reply2.id +1;
-				message rx2(general_IP,server_IP,global_mid,membership_i_join_u_type,10,reply.body);
+				message rx2(general_IP,server_IP,global_mid,membership_i_join_u_type,10,mip);
 				global_mid ++;
+				mip_vector.push_back(new MIP(sip, comm2));
 
 			} else {
 				cout<<"Connection was down ..."<<endl;      
@@ -124,11 +129,10 @@ int ClientCoreClerk::doServerCommand(){
 					message mx(general_IP,server_IP,global_mid,membership_leave_type,10,mip_vector[i]->multicast_IP);
 					global_mid++;
 					cn->send_message(mx);
+					return -1;
 
 				}
-				if(i==mip_vector.size()-1){
-					cout<<"You are not currently joined in this group."<<endl;
-				}
+				cout<<"You are not currently joined in this group."<<endl;
 			}
 		} else if(comm1 == "Select"){
 			cin >>comm2;
@@ -151,7 +155,7 @@ int ClientCoreClerk::doServerCommand(){
 				cin>>comm2;
 				if( FileExist(comm2) ){
 					string text = wholeAsciiFile( comm2 );
-					message mssg(general_IP,server_IP,global_mid,unicast_message_type,10,text);
+					message mssg(general_IP,current_IP,global_mid,unicast_message_type,10,text);
 					global_mid++;
 					cn->send_message(mssg);
 				} else {
@@ -160,7 +164,7 @@ int ClientCoreClerk::doServerCommand(){
 			} else if(comm2 == "message"){
 				string mess;
 				getline(cin,mess);
-				message mssg(general_IP,server_IP,global_mid,unicast_message_type,10,mess);
+				message mssg(general_IP,current_IP,global_mid,unicast_message_type,10,mess);
 				global_mid++;
 				cn->send_message(mssg);
 			}

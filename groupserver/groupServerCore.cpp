@@ -32,6 +32,7 @@ void GroupServerCoreClerk::doClientCommand(int fd){
 		ss >> t1;
 		if( t1 == "synch"){
 			// fbs
+			message reply(general_IP,mssg.source_ip,global_mid,unicast_message_type,10,"synch dadi");
 		} else {
 			message reply(general_IP,multicast_IP,global_mid,multicast_message_type,10,mssg.body);
 			global_mid++;

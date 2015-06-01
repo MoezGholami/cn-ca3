@@ -269,8 +269,6 @@ void router_kernel::handle_closing_connection(connection *con_ptr)
 
 	assert(parent!=null_pin);
 
-	pin_connections[parent].erase(find(pin_connections[parent].begin(), pin_connections[parent].end(), con_ptr));
-
 	for(map<string, connection *>::iterator it1=unicast_routing_table.begin();it1!=unicast_routing_table.end();)
 		if(it1->second==con_ptr)
 			unicast_routing_table.erase(it1++);
@@ -282,6 +280,7 @@ void router_kernel::handle_closing_connection(connection *con_ptr)
 			pending_volunteer.erase(it++);
 		else
 			++it;
+
 	for(map<string, connection *>::iterator it=prev_hop_from_source.begin(); it!=prev_hop_from_source.end();)
 		if(it->second==con_ptr)
 			prev_hop_from_source.erase(it++);
@@ -289,7 +288,7 @@ void router_kernel::handle_closing_connection(connection *con_ptr)
 			++it;
 
 	for(map<string, vector<connection *> >::iterator it2=multicast_routing_table.begin(); it2!=multicast_routing_table.end(); ++it2)
-		for(vector<connection *>::iterator it3=(it2->second).begin(); it3!=(it2->second).end(); ++it3)
+		for(vector<connection *>::iterator it3=(it2->second).begin(); it3!=(it2->second).end();)
 			if(*it3==con_ptr)
 				(it2->second).erase(it3++);
 			else

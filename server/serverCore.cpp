@@ -61,7 +61,8 @@ void ServerCoreClerk::doClientCommand( int fd ){
 			for(int i=0;i<sip_vector.size();i++){
 				if(sip_vector[i]-> group_name == t2){
 					cout<<"Group was found ..."<<endl;
-					message reply(general_IP,mssg.source_ip,global_mid,unicast_message_type,10,sip_vector[i]->multicast_IP);
+					message reply(general_IP,mssg.source_ip,global_mid,unicast_message_type,10,
+							sip_vector[i]->multicast_IP+" "+sip_vector[i]->server_IP);
 					global_mid++;
 					cn->send_message(reply);
 					break;
